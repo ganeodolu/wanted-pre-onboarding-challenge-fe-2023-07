@@ -14,7 +14,7 @@ interface Post {
   date: string
 }
 
-export function getSortedPostsData() : Post[] {
+export function getSortedPostsData() {
 	const fileNames = fs.readdirSync(postsDirectory);
 	const allPostsData = fileNames.map((fileName) => {
 		const id = fileName.replace(/\.md$/, "");
@@ -28,26 +28,27 @@ export function getSortedPostsData() : Post[] {
 			...matterResult.data,
 		};
 	});
-	console.log(allPostsData)
-	return allPostsData.sort((a, b) => {
-		return a.date > b.date ? -1 : 1;
-	});
+
+	return allPostsData
+
+	// return allPostsData.sort((a, b) => {
+	// 	return b.date - a.date
+	// });
 }
 
 export async function getPostData(id: string) {
 	const fullPath = path.join(postsDirectory, `${id}.md`);
 	const fileContents = fs.readFileSync(fullPath, "utf8");
 
-	// Use gray-matter to parse the post metadata section
 	const matterResult = matter(fileContents);
 
-	// Use remark to convert markdown into HTML string
 	const processedContent = await unified()
 		.use(remarkParse)
-		// .use(remarkHtml)
+		.use(remarkHtml)
 		.process(matterResult.content);
-    console.log(processedContent)
+    // console.log(processedContent)
 	const contentHtml = processedContent.toString();
+	// console.log(contentHtml)
 
 	// Combine the data with the id and contentHtml
 	return {
